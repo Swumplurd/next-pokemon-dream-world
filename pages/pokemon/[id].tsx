@@ -7,12 +7,17 @@ import { Layout } from "../../components/layouts";
 import { pokeApi } from "../../api";
 import { Pokemon } from "../../interfaces";
 import { Button, Card, Container, Grid, Image, Text } from "@nextui-org/react";
+import { localFavorites } from "../../utils";
 
 interface Props {
   pokemon: Pokemon
 }
 
 const PokemonPage: NextPage<Props> = ({pokemon}) => {
+  const onToggleFavorito = () => {
+    localFavorites.localFavorites( pokemon.id )
+  }
+
   return (
     <Layout title="Algun Pokemomo">
       <Grid.Container css={{ marginTop: '5px' }} gap={ 2 }>
@@ -31,9 +36,11 @@ const PokemonPage: NextPage<Props> = ({pokemon}) => {
           <Card>
             <Card.Header css={{ display: 'flex', justifyContent: 'space-between' }}>
               <Text h1 transform="capitalize">{ pokemon.name }</Text>
-              <Button color="gradient" ghost>
+
+              <Button color="gradient" ghost onPress={ onToggleFavorito }>
                 Guardar en favoritos
               </Button>
+
             </Card.Header>
             <Card.Body>
               <Text size={ 30 }>Sprites</Text>

@@ -10,6 +10,13 @@ const localFavorites = (id: number) => {
     localStorage.setItem('favoritos', JSON.stringify( favoritos ))
 }
 
-const exportedFunctions = {localFavorites}
+const existInFavorites = (id: number): boolean => {
+    if (typeof window === 'undefined') return false
 
+    const favorites: number[] = JSON.parse( localStorage.getItem('favoritos') || '[]' );
+
+    return favorites.includes(id)
+}
+
+const exportedFunctions = {localFavorites, existInFavorites}
 export default exportedFunctions

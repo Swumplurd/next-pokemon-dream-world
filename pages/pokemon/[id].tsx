@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NextPage } from 'next';
 import { GetStaticPaths } from 'next'
 import { GetStaticProps } from 'next'
@@ -14,12 +14,15 @@ interface Props {
 }
 
 const PokemonPage: NextPage<Props> = ({pokemon}) => {
+  const [isInFavorites, setIsInFavorites] = useState(localFavorites.existInFavorites( pokemon.id ))
+
   const onToggleFavorito = () => {
     localFavorites.localFavorites( pokemon.id )
+    setIsInFavorites( !isInFavorites )
   }
 
   return (
-    <Layout title="Algun Pokemomo">
+    <Layout title={ `Pokémon - ${ pokemon.name }` }>
       <Grid.Container css={{ marginTop: '5px' }} gap={ 2 }>
         <Grid xs={ 12 } sm={ 4 }>
           <Card isHoverable css={{ padding: '30px' }}>
@@ -37,8 +40,10 @@ const PokemonPage: NextPage<Props> = ({pokemon}) => {
             <Card.Header css={{ display: 'flex', justifyContent: 'space-between' }}>
               <Text h1 transform="capitalize">{ pokemon.name }</Text>
 
-              <Button color="gradient" ghost onPress={ onToggleFavorito }>
-                Guardar en favoritos
+              <Button color="gradient" ghost={ !isInFavorites } onClick={ onToggleFavorito }>
+                {
+                  !isInFavorites ? 'Guardar en favoritos' : 'Eliminar de favoritos'
+                }
               </Button>
 
             </Card.Header>
@@ -87,13 +92,23 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 }
 
 export const getStaticProps: GetStaticProps = async ({params}) => {
-  const {id} = params as { id: string }
+  const { id } = params as { id: string }
 
   const { data } = await pokeApi.get<Pokemon>(`/pokemon/${ id }`);
 
+  const essentialData = {
+    name: data.name,
+    id: data.id,
+    sprites: {
+      ...data.sprites,
+      other: {...data.sprites.other},
+      versions: {}
+    }
+  }
+
   return {
     props: {
-      pokemon: data
+      pokemon: essentialData
     }
   }
 }
